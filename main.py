@@ -1,53 +1,41 @@
-from fastapi import FastAPI,Path
+from fastapi import FastAPI, Path
 from typing import Annotated
+
+
+from core.models import Base, db_helper
+from fastapi.concurrency import asynccontextmanager
 from items_views import router as items_router
 from users.views import router as users_router
 
 
-
-app = FastAPI(title='FastAPI_try_2')
-app.include_router(items_router,tags=['Items'])
-app.include_router(users_router,tags=['Users'])
-
-
-
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with db_helper.engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
 
 
+app = FastAPI(title="FastAPI_try_2", lifespan=lifespan)
+app.include_router(items_router, tags=["Items"])
+app.include_router(users_router, tags=["Users"])
 
 
-@app.get('/')
+@app.get("/")
 async def hello_index():
-    return {'message':f'Hello'}
+    return {"message": f"Hello"}
 
 
-
-@app.get('/hello')
-async def hello(name:str = ''):
+@app.get("/hello")
+async def hello(name: str = ""):
     name = name.title()
-    return {'message':f'Hello {name}'}
+    return {"message": f"Hello {name}"}
 
 
+@app.post("/calc/add")
+async def add(a: int, b: int):
+    return {"a": a, "b": b, "res": a + b}
 
 
-
-
-   
-   
-@app.post('/calc/add')
-async def add(a: int ,b: int):
-    return {
-        'a':a,
-        'b':b,
-        'res': a+b
-    }
-    
-
-
-@app.get('/items/{id}')
+@app.get("/items/{id}")
 async def list_items(id: Annotated[int, Path(ge=1)]):
-    return {
-        'items':
-            {'id':id}
-        }
-
-
+    return {"items": {"id": id}}
