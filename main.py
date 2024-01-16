@@ -1,5 +1,4 @@
 from fastapi import FastAPI,Path
-from pydantic import BaseModel, EmailStr
 from typing import Annotated
 from items_views import router as items_router
 from users.views import router as users_router
