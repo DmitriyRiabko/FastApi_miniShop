@@ -26,9 +26,9 @@ class DataBaseHelper:
         return session
 
     async def session_dependency(self) -> AsyncSession:
-        async with self.get_scoped_session() as session:
-            yield session
-            await session.remove()
+        session =  self.get_scoped_session()
+        yield session
+        await session.remove()
 
 
 db_helper = DataBaseHelper(url=settings.db_url, echo=settings.db_echo)
