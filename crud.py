@@ -16,10 +16,10 @@ async def create_user(session:AsyncSession, username:str) -> User:
 
 
 async def main():
-    async with db_helper.session_factory as session:
+    async with db_helper.session_factory() as session:
         await create_user(session=session,username='john')
         await create_user(session=session,username='sam')
         
 
-if __name__ == '__name__':
+if __name__ == '__main__':
     asyncio.run(main())
