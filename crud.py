@@ -68,6 +68,18 @@ async def get_users_with_posts(
         for post in user.posts:
             print(post)
     ...
+    
+    
+async def get_posts_with_authors(session:AsyncSession):
+    stmt = select(Post).options(joinedload(Post.user)).order_by(Post.id)
+    posts = await session.scalars(stmt)
+    
+    for post in posts:
+        print('-',post)
+        print('+',post.user.username)
+        
+        
+        
 
 async def main():
     async with db_helper.session_factory() as session:
@@ -98,7 +110,9 @@ async def main():
         # )
         
         
-        await get_users_with_posts(session=session)
+        # await get_users_with_posts(session=session)
+        
+        await get_posts_with_authors(session=session)
         ...
 
 
