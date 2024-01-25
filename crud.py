@@ -3,7 +3,7 @@ from core.models import db_helper, User, Profile, Post
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.engine import Result
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 
 async def create_user(session: AsyncSession, username: str) -> User:
@@ -80,6 +80,41 @@ async def get_posts_with_authors(session:AsyncSession):
         
         
         
+async def get_users_with_posts_and_profiles(
+    session: AsyncSession
+):
+    stmt = select(User).options(joinedload(User.profile),selectinload(User.posts)).order_by(User.id)
+    users = await session.scalars(stmt)
+    
+    for user in users.unique():
+        print('**')
+        print(user)
+        print(user.profile.first_name)
+        
+        for post in user.posts:
+            print(post)
+    ...
+        
+        
+async def get_profiles_with_users_and_users_with_posts(session:AsyncSession):
+    stmt = (
+        select(Profile)
+        .options(
+            joinedload(Profile.user).selectinload(User.posts)
+        )
+        
+        .order_by(Profile.id)   
+    )
+    
+    
+    profiles = await session.scalars(stmt)
+    
+    
+    for profile in profiles:
+        print(profile.first_name , profile.user)
+        print( profile.user.posts)
+        
+    ...
 
 async def main():
     async with db_helper.session_factory() as session:
@@ -112,7 +147,9 @@ async def main():
         
         # await get_users_with_posts(session=session)
         
-        await get_posts_with_authors(session=session)
+        # await get_posts_with_authors(session=session)
+        
+        await get_profiles_with_users_and_users_with_posts(session=session)
         ...
 
 
