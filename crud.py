@@ -1,5 +1,5 @@
 import asyncio
-from core.models import db_helper, User, Profile
+from core.models import db_helper, User, Profile, Post
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.engine import Result
@@ -44,6 +44,31 @@ async def show_users_with_profile(session: AsyncSession) -> list[User]:
         print(user.profile.first_name)
 
 
+async def create_posts(
+    session: AsyncSession, user_id: int, *posts_titles: str
+) -> list[Post]:
+    posts = [Post(title=title, user_id=user_id) for title in posts_titles]
+
+    session.add_all(posts)
+    await session.commit()
+    print(posts)
+    return posts
+    
+
+
+async def get_users_with_posts(
+    session: AsyncSession
+):
+    stmt = select(User).options(joinedload(User.posts)).order_by(User.id)
+    users = await session.scalars(stmt)
+    
+    for user in users.unique():
+        print('**')
+        print(user)
+        for post in user.posts:
+            print(post)
+    ...
+
 async def main():
     async with db_helper.session_factory() as session:
         # await create_user(session=session,username='john')
@@ -58,7 +83,22 @@ async def main():
         # await create_user_profile(
         #     session=session, user_id=user_sam.id, first_name="Sam",last_name='White'
         # )
-        await show_users_with_profile(session=session)
+        # await show_users_with_profile(session=session)
+        
+        # await create_posts(
+        #     session,
+        #     user_john.id,
+        #     'SQLa 2.0','SQLa join'
+        # )
+        
+        # await create_posts(
+        #     session,
+        #     user_sam.id,
+        #     'FastAPI intro','FastAPI advanced','FastApi more'
+        # )
+        
+        
+        await get_users_with_posts(session=session)
         ...
 
 
