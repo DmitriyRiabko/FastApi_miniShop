@@ -1,5 +1,5 @@
 import asyncio
-from core.models import db_helper, User, Profile, Post
+from core.models import db_helper, User, Profile, Post, Order
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.engine import Result
@@ -157,8 +157,21 @@ async def main_relations(session:AsyncSession):
     
     
     
-async def  demo_m2m(session:AsyncSession):
+   
+async def create_order(session:AsyncSession, promocode:str |None = None) -> Order:
+    order  = Order(promocode=promocode)
     
+    session.add(order)
+    await session.commit()
+    return order
+    
+    
+    
+    
+    
+async def  demo_m2m(session:AsyncSession):
+    order_one = await create_order(session)
+    order_promo = await create_order(session, promocode='promo')
     
     
     pass
