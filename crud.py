@@ -184,7 +184,16 @@ async def  demo_m2m(session:AsyncSession):
     
     
     
+    order_one =await session.get(
+        Order,order_one.id,
+        options=(selectinload(Order.products))
+    )
     
+     
+    order_promo =await session.get(
+        Order,order_one.id,
+        options=(selectinload(Order.products))
+    )
     
     
     order_one.products.append(mouse)
