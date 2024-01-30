@@ -184,15 +184,17 @@ async def  demo_m2m(session:AsyncSession):
     
     
     
-    order_one =await session.get(
-        Order,order_one.id,
-        options=(selectinload(Order.products))
+    order_one =await session.scalar(
+        select(Order)
+        .where(Order.id == order_one.id)
+        .options(selectinload(Order.products))
     )
     
      
-    order_promo =await session.get(
-        Order,order_one.id,
-        options=(selectinload(Order.products))
+    order_promo =await session.scalar(
+       select( Order)
+       .where(Order.id == order_promo.id)
+       .options(selectinload(Order.products))
     )
     
     
@@ -203,7 +205,7 @@ async def  demo_m2m(session:AsyncSession):
     order_promo.products.append(keyboard)
     order_one.products.append(display)
     
-    
+    await session.commit()
     
     pass
     
