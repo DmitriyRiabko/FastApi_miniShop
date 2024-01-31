@@ -13,4 +13,7 @@ class OrderProductAssociation(Base):
     id:Mapped[int] = mapped_column(primary_key=True)
     order_id:Mapped[int] = mapped_column(ForeignKey('orders.id'))
     product_id:Mapped[int] = mapped_column(ForeignKey('products.id'))
+    count:Mapped[int] = mapped_column(default=1)
+    # unit_price: Mapped[int] = mapped_column()
+    
     
